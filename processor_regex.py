@@ -1,6 +1,5 @@
 import re
 
-
 def classify_with_regex(log_message):
     regex_patterns = {
         r"User User\d+ logged (in|out).": "User Action",

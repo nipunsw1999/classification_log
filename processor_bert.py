@@ -1,29 +1,29 @@
-from sentence_transformers import SentenceTransformer
 import joblib
+from sentence_transformers import SentenceTransformer
 
-# Load the saved model
-classifier_model = joblib.load("models/log_classifier.joblib")
+model_embedding = SentenceTransformer('all-MiniLM-L6-v2',use_auth_token='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')  # Lightweight embedding model
+model_classification = joblib.load("models/log_classifier.joblib")
 
-# Load the SentenceTransformer model to generate embeddings
-transformer_model = SentenceTransformer('all-MiniLM-L6-v2')
 
 def classify_with_bert(log_message):
-    # Generate the log message embedding
-    message_embedding = transformer_model.encode(log_message)
+    embeddings = model_embedding.encode([log_message])
+    probabilities = model_classification.predict_proba(embeddings)[0]
+    if max(probabilities) < 0.5:
+        return "Unclassified"
+    predicted_label = model_classification.predict(embeddings)[0]
 
-    # Predict the classification label
-    predicted_class = classifier_model.predict(message_embedding)[0]
-    return predicted_class
+    return predicted_label
 
 
 if __name__ == "__main__":
-    log_message = [
-        "User User1 logged in."
-        "Backup started at 12:00."
-        "Backup completed successfully."
-        "System updated to version 1.0."
+    logs = [
+         "alpha.osapi_compute.wsgi.server - 12.10.11.1 - API returned 404 not found error",
+         "GET /v2/3454/servers/detail HTTP/1.1 RCODE   404 len: 1583 time: 0.1878400",
+         "System crashed due to drivers errors when restarting the server",
+        "Hey bro, chill ya!",
+         "Multiple login failures occurred on user 6454 account",
+         "Server A790 was restarted unexpectedly during the process of data transfer"
     ]
-
-    for log in log_message:
+    for log in logs:
         label = classify_with_bert(log)
         print(log, "->", label)
