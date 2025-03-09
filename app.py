@@ -7,8 +7,10 @@ st.title("Log Classification")
 
 file = st.file_uploader("Upload a CSV file", type="csv")
 
+st.write(":red[File Structire:] :blue[source, log_message]")
+
 if file is not None:
-    classify_btn = st.button("Classify")
+    classify_btn = st.button(":green[Classify]")
 
     if classify_btn:
         with st.spinner("Classifying..."):
